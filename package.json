@@ -1,0 +1,11 @@
+{
+  "name": "yonko",
+  "version": "1.0.0",
+  "description": "Yonko API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "winner_don",
+  "license": "ISC"
+}
