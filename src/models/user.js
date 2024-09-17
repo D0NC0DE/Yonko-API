@@ -15,13 +15,12 @@ const userSchema = new Schema(
         refreshToken: { type: String },
         status: {
             type: String,
-            enum: ['PENDING', 'VERIFIED', 'DELETED', 'ACTIVE'],
+            enum: ['PENDING', 'VERIFIED', 'INCOMPLETE', 'ACTIVE', 'DELETED'],
             default: 'PENDING',
         },
         gender: {
             type: String,
             enum: ['MALE', 'FEMALE', 'OTHER'],
-            default: null,
         },
         address: {
             street: { type: String },
@@ -34,7 +33,7 @@ const userSchema = new Schema(
         lastLogin: { type: Date },
 
     },
-    { timestamp: true }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model('User', userSchema);

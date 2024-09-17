@@ -19,7 +19,7 @@ const shopSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ['PENDING', 'PAID', 'VERIFIED', 'DELETED', 'ACTIVE'],
+            enum: ['PENDING', 'VERIFIED', 'INCOMPLETE', 'PAID', 'ACTIVE', 'DELETED'],
             default: 'PENDING',
         },
         address: {
@@ -33,7 +33,7 @@ const shopSchema = new Schema(
         lastLogin: { type: Date },
 
     },
-    { timestamp: true }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model('Shop', shopSchema);
