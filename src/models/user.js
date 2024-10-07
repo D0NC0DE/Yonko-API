@@ -8,11 +8,10 @@ const userSchema = new Schema(
         name: { type: String },
         email: { type: String, required: true, unique: true },
         password: { type: String },
-        number: { type: String },
+        phone: { type: String },
         birthDate: { type: Date },
         avatar: { type: String },
         token: { type: String },
-        refreshToken: { type: String },
         status: {
             type: String,
             enum: ['PENDING', 'VERIFIED', 'INCOMPLETE', 'ACTIVE', 'DELETED'],
@@ -20,7 +19,7 @@ const userSchema = new Schema(
         },
         gender: {
             type: String,
-            enum: ['MALE', 'FEMALE', 'OTHER'],
+            enum: ['MALE', 'FEMALE', 'OTHERS'],
         },
         address: {
             street: { type: String },

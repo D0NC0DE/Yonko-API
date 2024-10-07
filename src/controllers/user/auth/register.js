@@ -1,14 +1,14 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 
-const Shop = require('../../models/shop');
+const User = require('../../../models/user');
 
-const OTPHandler = require('../../utils/otpHandler');
-const { ErrorHandler } = require('../../utils/errorHandler'); // import error handler
-const { sendWelcomeEmail, sendAccountSetupEmail } = require('../../services/emailService');
-const { generateToken } = require('../../utils/tokenGenerator');
+const OTPHandler = require('../../../utils/otpHandler');
+const { ErrorHandler } = require('../../../utils/errorHandler'); // import error handler
+const { sendWelcomeEmail, sendAccountSetupEmail } = require('../../../services/emailService');
+const { generateToken } = require('../../../utils/tokenGenerator');
 
-exports.postCreateShop = async (req, res, next) => {
+exports.postRegisterUser = async (req, res, next) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -16,48 +16,47 @@ exports.postCreateShop = async (req, res, next) => {
         }
 
         const email = req.body.email;
-        const shop = await Shop.findOne({ email: email });
+        const user = await User.findOne({ email: email });
 
-        if (!shop) {
+        if (!user) {
             const { otp, expiryTime } = OTPHandler();
-            const newShop = new Shop({
+            const newUser = new User({
                 email: email,
                 status: 'PENDING',
                 OTPCode: otp,
                 OTPExpirationTime: expiryTime,
             });
-            await newShop.save();
+            await newUser.save();
             // Send the OTP via email
             await sendAccountSetupEmail(email, otp);
-            return res.status(201).json({ message: 'New Shop created.' });
+            return res.status(201).json({ message: 'New user created.' });
         }
 
         const { otp, expiryTime } = OTPHandler();
 
-        switch (shop.status) {
+        switch (user.status) {
             case 'PENDING':
-                shop.OTPCode = otp;
-                shop.OTPExpirationTime = expiryTime;
-                await shop.save();
+                user.OTPCode = otp;
+                user.OTPExpirationTime = expiryTime;
+                await user.save();
                 await sendAccountSetupEmail(email, otp);
                 return res.status(200).json({ message: 'Success!' });
 
             case 'VERIFIED':
             case 'DELETED':
-                shop.status = 'PENDING';
-                shop.OTPCode = otp;
-                shop.OTPExpirationTime = expiryTime;
-                await shop.save();
+                user.status = 'PENDING';
+                user.OTPCode = otp;
+                user.OTPExpirationTime = expiryTime;
+                await user.save();
                 await sendAccountSetupEmail(email, otp);
                 return res.status(200).json({ message: 'Success!' });
 
             case 'INCOMPLETE':
             case 'ACTIVE':
-            case 'PAID':
                 throw new ErrorHandler(409, 'Error: Email already exists.');
 
             default:
-                throw new ErrorHandler(400, 'Invalid shop status.');
+                throw new ErrorHandler(400, 'Invalid user status.');
         }
 
     } catch (err) {
@@ -77,25 +76,25 @@ exports.postVerifyOTP = async (req, res, next) => {
 
         const email = req.body.email;
         const otp = req.body.otp;
-        const shop = await Shop.findOne({ email: email });
+        const user = await User.findOne({ email: email });
 
-        if (!shop || shop.OTPCode !== otp.toString()) {
+        if (!user || user.OTPCode !== otp.toString()) {
             return res.status(400).json({ message: 'Invalid OTP' });
         }
 
-        if (new Date() > shop.OTPExpirationTime) {
+        if (new Date() > user.OTPExpirationTime) {
             return res.status(400).json({ message: 'OTP has expired' });
         }
 
-        const token = generateToken({ email: email, shopId: shop._id.toString() }, '1d',)
+        const token = generateToken({ email: email, userId: user._id.toString() });
 
-        shop.status = 'VERIFIED';
-        shop.OTPCode = null;
-        shop.OTPExpirationTime = null;
-        shop.token = token;
-        await shop.save();
+        user.status = 'VERIFIED';
+        user.OTPCode = null;
+        user.OTPExpirationTime = null;
+        user.token = token;
+        await user.save();
 
-        res.status(200).json({ message: 'shop verified successfully' });
+        res.status(200).json({ message: 'User verified successfully' });
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
@@ -112,21 +111,21 @@ exports.postResendOTP = async (req, res, next) => {
         }
 
         const email = req.body.email;
-        const shop = await Shop.findOne({ email: email });
+        const user = await User.findOne({ email: email });
 
-        if (!shop) {
-            throw new ErrorHandler(404, 'shop not found.');
+        if (!user) {
+            throw new ErrorHandler(404, 'User not found.');
         }
 
-        if (shop.status !== 'PENDING') {
-            throw new ErrorHandler(400, 'Cannot resend OTP, shop is not in pending status.');
+        if (user.status !== 'PENDING') {
+            throw new ErrorHandler(400, 'Cannot resend OTP, user is not in pending status.');
         }
 
         // Generate new OTP
         const { otp, expiryTime } = OTPHandler();
-        shop.OTPCode = otp;
-        shop.OTPExpirationTime = expiryTime;
-        await shop.save();
+        user.OTPCode = otp;
+        user.OTPExpirationTime = expiryTime;
+        await user.save();
         await sendAccountSetupEmail(email, otp);
         return res.status(200).json({ message: 'OTP resent successfully.' });
 
@@ -140,8 +139,8 @@ exports.postResendOTP = async (req, res, next) => {
 
 exports.postSetPassword = async (req, res, next) => {
     try {
-        const shopId = req.shopId;
-        if (!shopId) {
+        const userId = req.userId;
+        if (!userId) {
             throw new ErrorHandler(401, 'Not authenticated!');
         }
 
@@ -150,21 +149,22 @@ exports.postSetPassword = async (req, res, next) => {
             throw new ErrorHandler(422, 'Validation failed.', errors.array());
         }
 
-        const shop = await Shop.findOne({ _id: shopId });
+        // const user = await User.findOne({ _id: userId });
+        const user = await User.findById(userId);
         const password = req.body.password;
-        const email = shop.email;
+        const email = user.email;
 
-        if (!shop) {
-            throw new ErrorHandler(404, 'shop not found.');
+        if (!user) {
+            throw new ErrorHandler(404, 'User not found.');
         }
 
-        if (shop.status !== 'VERIFIED') {
-            throw new ErrorHandler(400, 'Cannot send password, shop is not verified.');
+        if (user.status !== 'VERIFIED') {
+            throw new ErrorHandler(400, 'Cannot send password, user is not verified.');
         }
 
-        shop.password = await bcrypt.hash(password, 12);
-        shop.status = 'INCOMPLETE';
-        await shop.save();
+        user.password = await bcrypt.hash(password, 12);
+        user.status = 'INCOMPLETE';
+        await user.save();
         await sendWelcomeEmail(email);
         return res.status(200).json({ message: 'Password set successfully.' });
 
