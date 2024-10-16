@@ -22,7 +22,7 @@ exports.postLogin = async (req, res, next) => {
             throw new ErrorHandler(401, 'Shop account is not active.');
         }
 
-        if(shop.subscription !== 'PAID') {
+        if(shop.subscription === 'UNPAID') {
             throw new ErrorHandler(401, 'Shop subscription is not active.');
         }
 

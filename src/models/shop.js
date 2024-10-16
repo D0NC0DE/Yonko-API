@@ -13,7 +13,7 @@ const shopSchema = new Schema(
         avatar: { type: String },
         token: { type: String },
         subscription: { type: String, 
-            enum: ['UNPAID', 'PAID', 'TRIAL', 'EXPIRED'],
+            enum: ['UNPAID', 'BASIC', 'PREMIUM', 'ELITE'],
             default: 'UNPAID',
         },
         category: {
