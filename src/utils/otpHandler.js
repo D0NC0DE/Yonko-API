@@ -10,7 +10,8 @@ const OTPHandler = (length = 4, expiresInMinutes = 5) => {
     // Set expiration time (current time + expiresInMinutes)
     const now = new Date();
     const expiryTime = new Date(now.getTime() + expiresInMinutes * 60000);
-
+    //TO:DO: Make the OTP null after the expiry time
+    
     return { otp, expiryTime };
 };
 

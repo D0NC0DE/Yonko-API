@@ -4,14 +4,14 @@ const express = require('express');
 // initialize packages
 const router = express.Router();
 
-const { emailValidationRules, passwordValidationRules, stringValidationRules } = require('../validations/validators');
+const { emailValidationRules, passwordValidationRules, stringValidationRules } = require('../../../validations/validators');
 
 // Controllers
-const productController = require('../controllers/product/product');
+const productController = require('../../../controllers/product/product');
 
 // Middleware
-const shopAuth = require('../middleware/shopAuth');
-const checkShopStatus = require('../validations/checkShopStatus');
+const shopAuth = require('../../../middleware/shopAuth');
+const checkShopStatus = require('../../../validations/checkShopStatus');
 
 // Routes
 //POST /product/
