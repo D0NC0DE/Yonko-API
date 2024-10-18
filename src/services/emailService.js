@@ -6,11 +6,11 @@ const postmark = require("postmark");
 const config = require('../config/config');
 const rootDir = require('../utils/path');
 
-const client = new postmark.ServerClient("af500cab-1146-47ae-a7cb-c4b2922a5bd4");
-sgMail.setApiKey(config.SENDGRID_API_KEY);
+const client = new postmark.ServerClient(config.POSTMARK_API_KEY);
 
 const templatePath = path.join(rootDir, 'static', 'template.ejs');
 
+// TODO: Refactor this function to accomade different email types
 const sendEmail = async (type, recipientEmail, OTP = null) => {
     let htmlContent, subject, text;
 
@@ -46,15 +46,6 @@ const sendEmail = async (type, recipientEmail, OTP = null) => {
         "TextBody": text, // Plain text version of the email
         "HtmlBody": htmlContent, // HTML version of the email
     };
-
-    // client.sendEmail({
-    //     "From": "admin@yonkomktp.com",
-    //     "To": "admin@yonkomktp.com",
-    //     "Subject": "Hello from Postmark",
-    //     "HtmlBody": "<strong>Hello</strong> dear Postmark user.",
-    //     "TextBody": "Hello from Postmark!",
-    //     "MessageStream": "outbound"
-    //   });
 
     try {
         await client.sendEmail(msg);
