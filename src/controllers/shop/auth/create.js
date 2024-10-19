@@ -95,7 +95,7 @@ exports.postVerifyOTP = async (req, res, next) => {
         shop.token = token;
         await shop.save();
 
-        res.status(200).json({ message: 'shop verified successfully' });
+        res.status(200).json({ message: 'shop verified successfully',  data: { "token": token } });
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
