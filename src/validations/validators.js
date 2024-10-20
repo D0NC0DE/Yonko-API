@@ -1,5 +1,7 @@
 const { body } = require('express-validator');
 
+//TO:DO: Handle empty body rewuest
+
 const emailValidationRules = () => {
     return [
         body('email')
@@ -28,8 +30,18 @@ const stringValidationRules = (field) => {
     ];
 }
 
+const packageValidationRules = () => {
+    return [
+        body('package')
+            .isIn(['BASIC', 'PREMIUM', 'ELITE'])
+            .withMessage('Invalid package type')
+            .trim()
+    ];
+};
+
 module.exports = {
     emailValidationRules,
     passwordValidationRules,
-    stringValidationRules
+    stringValidationRules,
+    packageValidationRules
 };

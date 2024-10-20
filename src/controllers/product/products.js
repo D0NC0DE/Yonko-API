@@ -15,7 +15,7 @@ exports.getProducts = async (req, res, next) => {
 
         // Filter by category if provided
         if (category) {
-            filter.category = category;
+            filter.category = category.toUpperCase();
         }
 
         // Filter by price range if minPrice or maxPrice is provided
@@ -52,7 +52,7 @@ exports.getShopProducts = async (req, res, next) => {
         // Define the filter based on shopId and optional status
         let filter = { shopId };
         if (status) {
-            filter.status = status; // Only filter by status if provided
+            filter.status = status.toUpperCase(); // Only filter by status if provided
         }
 
         // Find products based on shopId and status (if provided)
