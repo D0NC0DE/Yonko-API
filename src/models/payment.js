@@ -6,7 +6,7 @@ const paymentSchema = new Schema(
     {
         id: { type: String, default: () => randomUUID() },
         email: { type: String, required: true },
-        amount: { type: mongoose.Types.Decimal128, required: true },
+        amount: { type: Number, required: true },
         status: {
             type: String,
             enum: ['PENDING', 'VERIFIED', 'FAILED', 'REVERSED', 'ABANDONED'],
@@ -20,7 +20,7 @@ const paymentSchema = new Schema(
         reference: { type: String, required: true },
         shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-
+        transactionId: { type: String},
     },
     { timestamps: true }
 );
@@ -32,5 +32,7 @@ paymentSchema.pre('validate', function (next) {
         next();
     }
 });
+
+paymentSchema.index({ reference: 1 });
 
 module.exports = mongoose.model('Payment', paymentSchema);
