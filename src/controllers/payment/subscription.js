@@ -103,7 +103,6 @@ exports.verifySubscription = async (req, res, next) => {
         }
 
         // Check if the amount matches
-        console.log(payment.amount.toString(), paymentStatus.amount.toString());
         if (payment.amount.toString() !== paymentStatus.amount.toString()) {
             throw new ErrorHandler(400, 'Amount mismatch');
         }

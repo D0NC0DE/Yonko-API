@@ -87,8 +87,6 @@ exports.getVerifyPayment = async (reference) => {
     };
 
     // Return the filtered data
-    console.log(response.data.data);
-    console.log(filteredData);
     return filteredData;
     
   } catch (error) {
