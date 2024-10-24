@@ -19,7 +19,7 @@ exports.createProduct = async (req, res, next) => {
         const {
             name,
             description,
-            image,
+            images,
             category,
             specifications,
             variants,
@@ -33,7 +33,7 @@ exports.createProduct = async (req, res, next) => {
             name,
             description,
             shopId,
-            image,
+            images,
             category,
             specifications,
             variants,
@@ -116,7 +116,7 @@ exports.updateProduct = async (req, res, next) => {
         const {
             name,
             description,
-            image,
+            images,
             category,
             specifications,
             variants,
@@ -128,7 +128,7 @@ exports.updateProduct = async (req, res, next) => {
         // Only update fields that are provided in the request body
         if (isNotEmpty(name)) product.name = name;
         if (isNotEmpty(description)) product.description = description;
-        if (isNotEmpty(image)) product.image = image;
+        if (isNotEmpty(images)) product.images = images;
         if (isNotEmpty(category)) product.category = category;
         if (isNotEmpty(specifications)) product.specifications = specifications;
         if (isNotEmpty(variants)) product.variants = variants;
