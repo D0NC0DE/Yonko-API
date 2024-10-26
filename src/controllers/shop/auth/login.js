@@ -31,9 +31,7 @@ exports.postLogin = async (req, res, next) => {
             throw new ErrorHandler(401, 'Password is required.');
         } 
 
-        console.log('password', password);
         const isPasswordMatch = await bcrypt.compare(password, shop.password);
-        console.log('isPasswordMatch', isPasswordMatch);
         if (!isPasswordMatch) {
             throw new ErrorHandler(401, 'Invalid email or password.');
         }
