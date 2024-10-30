@@ -14,4 +14,7 @@ module.exports = {
     POSTMARK_API_KEY: process.env.POSTMARK_API_KEY,
     JWT_SECRET: process.env.JWT_SECRET,
     PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+
+    SPACE_ACCESS_ID: process.env.SPACE_ACCESS_ID,
+    SPACE_ACCESS_KEY: process.env.SPACE_ACCESS_KEY,
 };

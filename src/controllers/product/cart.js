@@ -1,10 +1,10 @@
-const Cart = require('../../models/cart'); // Assuming your cart schema is stored in this path
-const Product = require('../../models/product'); // Assuming your product schema is stored here
+const Cart = require('../../models/cart'); 
+const Product = require('../../models/product'); 
 const { ErrorHandler } = require('../../utils/errorHandler');
 
 exports.addToCart = async (req, res, next) => {
     try {
-        const userId = req.userId; // Assuming you get userId from token or session
+        const userId = req.userId; 
         if (!userId) {
             throw new ErrorHandler(403, 'User not authenticated');
         }
