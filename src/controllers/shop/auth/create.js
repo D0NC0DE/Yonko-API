@@ -150,7 +150,6 @@ exports.postSetPassword = async (req, res, next) => {
             throw new ErrorHandler(422, 'Validation failed.', errors.array());
         }
 
-        // const shop = await Shop.findOne({ _id: shopId });
         const shop = await Shop.findById(shopId);
         const password = req.body.password;
         const email = shop.email;

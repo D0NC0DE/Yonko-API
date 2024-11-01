@@ -4,8 +4,6 @@ const express = require('express');
 // initialize packages
 const router = express.Router();
 
-const { emailValidationRules, passwordValidationRules, stringValidationRules } = require('../../../validations/validators');
-
 // Controllers
 const productsController = require('../../../controllers/product/products');
 
@@ -16,6 +14,7 @@ const shopAuth = require('../../../middleware/shopAuth');
 //GET /products/
 router.get('/shopProducts', shopAuth, productsController.getShopProducts);
 router.get('/', productsController.getProducts);
+router.get('/:productId', productsController.getProduct);
 
 
 module.exports = router;

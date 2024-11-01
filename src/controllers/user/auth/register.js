@@ -149,7 +149,6 @@ exports.postSetPassword = async (req, res, next) => {
             throw new ErrorHandler(422, 'Validation failed.', errors.array());
         }
 
-        // const user = await User.findOne({ _id: userId });
         const user = await User.findById(userId);
         const password = req.body.password;
         const email = user.email;
