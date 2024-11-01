@@ -14,7 +14,7 @@ router.use('/user', userRoutes);
 router.use('/shop', shopRoutes);
 router.use('/shops', shopsRoutes);
 router.use('/product', productRoutes);
-router.use('/products', productsRoutes);
+router.use('/', productsRoutes);
 router.use('/cart', cartRoutes);
 router.use('/', subscriptionRoutes);
 router.use('/s3', s3Routes);

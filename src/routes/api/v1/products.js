@@ -12,9 +12,10 @@ const shopAuth = require('../../../middleware/shopAuth');
 
 // Routes
 //GET /products/
+const rootRoute = '/products';
 router.get('/shopProducts', shopAuth, productsController.getShopProducts);
-router.get('/', productsController.getProducts);
-router.get('/:productId', productsController.getProduct);
+router.get(`${rootRoute}`, productsController.getProducts);
+router.get(`${rootRoute}/:productId`, productsController.getProduct);
 
 
 module.exports = router;
