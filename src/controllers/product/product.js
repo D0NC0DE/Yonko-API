@@ -76,6 +76,14 @@ exports.addProduct = async (req, res, next) => {
             throw new ErrorHandler(404, 'Product not found or does not belong to this shop.');
         }
 
+        // Check if the product is already published or deleted
+        if (product.status === 'PUBLISHED') {
+            throw new ErrorHandler(400, 'Product is already published.');
+        }
+        if (product.status === 'DELETED') {
+            throw new ErrorHandler(400, 'Cannot publish a deleted product.');
+        }
+
         // Update the product status to 'PUBLISHED'
         product.status = 'PUBLISHED';
         await product.save();
@@ -107,11 +115,18 @@ exports.updateProduct = async (req, res, next) => {
             throw new ErrorHandler(400, 'Product ID is required.');
         }
 
-        // Find the product by productId and ensure it belongs to the shop
         const product = await Product.findOne({ _id: productId, shopId });
 
         if (!product) {
             throw new ErrorHandler(404, 'Product not found or does not belong to this shop.');
+        }
+
+        if (product.status === 'DELETED') {
+            throw new ErrorHandler(400, 'Deleted products cannot be edited.');
+        }
+
+        if (product.status === 'PUBLISHED') {
+            throw new ErrorHandler(400, 'Published products must be moved to draft before editing.');
         }
 
         // Destructure the fields to update from the request body
@@ -137,7 +152,6 @@ exports.updateProduct = async (req, res, next) => {
         if (isNotEmpty(addOns)) product.addOns = addOns;
         if (isNotEmpty(basePrice) && basePrice > 0) product.basePrice = basePrice;
         if (isNotEmpty(baseQuantity) && baseQuantity >= 0) product.baseQuantity = baseQuantity;
-    
 
         // Save the updated product to the database
         await product.save();
@@ -160,19 +174,23 @@ exports.removeProduct = async (req, res, next) => {
             throw new ErrorHandler(403, 'Forbidden');
         }
 
-        const productId = req.body.productId; // Assuming productId is passed in the request body
+        const productId = req.body.productId; 
         if (!productId) {
             throw new ErrorHandler(400, 'Product ID is required.');
         }
 
-        // Find the product by productId and ensure it belongs to the shop
         const product = await Product.findOne({ _id: productId, shopId });
 
         if (!product) {
             throw new ErrorHandler(404, 'Product not found or does not belong to this shop.');
         }
 
-        // Update the product status to 'PUBLISHED'
+        // Check if the product is published
+        if (product.status !== 'PUBLISHED') {
+            throw new ErrorHandler(400, 'Only published products can be removed.');
+        }
+
+        // Update the product status to 'DRAFT'
         product.status = 'DRAFT';
         await product.save();
 
@@ -198,14 +216,18 @@ exports.deleteProduct = async (req, res, next) => {
             throw new ErrorHandler(400, 'Product ID is required.');
         }
 
-        // Find the product by productId and ensure it belongs to the shop
         const product = await Product.findOne({ _id: productId, shopId });
 
         if (!product) {
             throw new ErrorHandler(404, 'Product not found or does not belong to this shop.');
         }
 
-        // Update the product status to 'PUBLISHED'
+        // Check if the product is already deleted
+        if (product.status === 'DELETED') {
+            throw new ErrorHandler(400, 'Product is already deleted.');
+        }
+
+        // Update the product status to 'DELETED'
         product.status = 'DELETED';
         await product.save();
 
