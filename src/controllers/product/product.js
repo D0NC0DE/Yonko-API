@@ -16,6 +16,8 @@ exports.createProduct = async (req, res, next) => {
             throw new ErrorHandler(403, 'Forbidden');
         }
 
+        // TODO: Set basePrice and baseQuantity to the minimum value
+        // of the variants or options
         const {
             name,
             description,

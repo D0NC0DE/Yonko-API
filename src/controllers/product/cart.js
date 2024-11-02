@@ -1,10 +1,10 @@
-const Cart = require('../../models/cart'); 
-const Product = require('../../models/product'); 
+const Cart = require('../../models/cart');
+const Product = require('../../models/product');
 const { ErrorHandler } = require('../../utils/errorHandler');
 
 exports.addToCart = async (req, res, next) => {
     try {
-        const userId = req.userId; 
+        const userId = req.userId;
         if (!userId) {
             throw new ErrorHandler(403, 'User not authenticated');
         }
@@ -22,15 +22,39 @@ exports.addToCart = async (req, res, next) => {
             throw new ErrorHandler(404, 'Product not found.');
         }
 
-        // Find the cart for the user, if it exists
-        let cart = await Cart.findOne({ userId });
+        let totalPrice = product.basePrice * quantity;
 
-        // If no cart exists, create a new one
+        if (selectedVariant) {
+            const variant = product.variants.variantValues.find(vv => vv.value === selectedVariant);
+            if (variant) {
+                totalPrice = (variant.price || product.basePrice) * quantity;
+            }
+        }
+
+        if (selectedOption) {
+            const variant = product.variants.variantValues.find(vv => vv.value === selectedVariant);
+            if (variant) {
+                const option = variant.options.optionValues.find(o => o.value === selectedOption);
+                if (option) {
+                    totalPrice = (option.price || totalPrice) * quantity;
+                }
+            }
+        }
+
+        if (selectedAddOns && selectedAddOns.length > 0) {
+            selectedAddOns.forEach(addOn => {
+                const productAddOn = product.addOns.find(pAddOn => pAddOn.name === addOn.name);
+                if (productAddOn) {
+                    totalPrice += productAddOn.price * addOn.quantity;
+                }
+            });
+        }
+
+        let cart = await Cart.findOne({ userId });
         if (!cart) {
             cart = new Cart({ userId, items: [] });
         }
 
-        // Check if the product is already in the cart
         const existingProductIndex = cart.items.findIndex(
             (item) =>
                 item.productId.toString() === productId &&
@@ -38,14 +62,28 @@ exports.addToCart = async (req, res, next) => {
                 (item.selectedOption === selectedOption || (!item.selectedOption && !selectedOption))
         );
 
-
         if (existingProductIndex >= 0) {
             cart.items[existingProductIndex].quantity += quantity;
+            cart.items[existingProductIndex].price += totalPrice;
+
+            if (selectedAddOns && selectedAddOns.length > 0) {
+                selectedAddOns.forEach(addOn => {
+                    const existingAddOnIndex = cart.items[existingProductIndex].selectedAddOns.findIndex(
+                        existingAddOn => existingAddOn.name === addOn.name
+                    );
+
+                    if (existingAddOnIndex >= 0) {
+                        cart.items[existingProductIndex].selectedAddOns[existingAddOnIndex].quantity += addOn.quantity;
+                    } else {
+                        cart.items[existingProductIndex].selectedAddOns.push(addOn);
+                    }
+                });
+            }
         } else {
-            // Product does not exist, add a new item to the cart
             cart.items.push({
                 productId,
                 quantity,
+                price: totalPrice,
                 selectedVariant: selectedVariant,
                 selectedOption: selectedOption,
                 selectedAddOns: selectedAddOns

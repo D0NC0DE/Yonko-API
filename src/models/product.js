@@ -16,23 +16,19 @@ const optionValueSchema = new Schema({
     quantity: { type: Number, required: true, min: 0 },
 }, { _id: false });
 
-// Option schema for each variant (e.g., color options for size variants)
-const optionSchema = new Schema({
-    optionName: { type: String, required: true },
-    optionValues: [optionValueSchema],
-}, { _id: false });
-
 const variantValueSchema = new Schema({
     value: { type: String, required: true },
     price: { type: Number, min: 0 },
     quantity: { type: Number, min: 0 },
-    options: [optionSchema],
-}, { _id: false });
-
-// Variant schema (e.g., Size) containing nested options (e.g., Color)
-const variantSchema = new Schema({
-    variantName: { type: String, required: true },
-    variantValues: [variantValueSchema],
+    options: {
+        optionName: {
+            type: String,
+            required: function () {
+                return this.optionValues && this.optionValues.length > 0;
+            }
+        },
+        optionValues: [optionValueSchema],
+    },
 }, { _id: false });
 
 // Product schema containing variants and optional add-ons
@@ -53,7 +49,15 @@ const productSchema = new Schema({
         enum: ['FOOD', 'MEDICINE', 'SUPERMARKET', 'BEAUTY', 'PET', 'TECH', 'CLOTHING', 'PLANT', 'HOUSEHOLD', 'OTHERS'],
     },
     specifications: { type: Map, of: String },
-    variants: [variantSchema],
+    variants: {
+        variantName: {
+            type: String,
+            required: function () {
+                return this.variantValues && this.variantValues.length > 0;
+            }
+        },
+        variantValues: [variantValueSchema],
+    },
     addOns: [addOnSchema],
     basePrice: { type: Number, required: true, min: 0 },
     baseQuantity: { type: Number, required: true, min: 0 },
@@ -66,4 +70,5 @@ productSchema.index({ _id: 1, shopId: 1 });
 module.exports = mongoose.model('Product', productSchema);
 
 
-//// BREAK THIS DOWN LATER AND HAVE A SEPERATE FILE FOR VARIANTS AND ADDONS
+//// TODO: BREAK THIS DOWN LATER AND HAVE A SEPERATE FILE FOR VARIANTS AND ADDONS
+//// Handle performance later
