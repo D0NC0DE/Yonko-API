@@ -11,12 +11,14 @@ const cartSchema = new Schema(
         },
         items: [
             {
+                _id: false,
                 productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
                 quantity: { type: Number, required: true },
-                selectedVariant: { type: String, default: null },
-                selectedOption: { type: String, default: null },
+                selectedVariant: { type: String },
+                selectedOption: { type: String },
                 selectedAddOns: [
                     {
+                        _id: false,
                         name: { type: String, required: true },
                         quantity: { type: Number, required: true }
                     }

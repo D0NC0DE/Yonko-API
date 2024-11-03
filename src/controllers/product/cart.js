@@ -31,7 +31,7 @@ exports.addToCart = async (req, res, next) => {
             }
         }
 
-        if (selectedOption) {
+        if (selectedOption && selectedVariant) {
             const variant = product.variants.variantValues.find(vv => vv.value === selectedVariant);
             if (variant) {
                 const option = variant.options.optionValues.find(o => o.value === selectedOption);
@@ -63,9 +63,6 @@ exports.addToCart = async (req, res, next) => {
         );
 
         if (existingProductIndex >= 0) {
-            cart.items[existingProductIndex].quantity += quantity;
-            cart.items[existingProductIndex].price += totalPrice;
-
             if (selectedAddOns && selectedAddOns.length > 0) {
                 selectedAddOns.forEach(addOn => {
                     const existingAddOnIndex = cart.items[existingProductIndex].selectedAddOns.findIndex(
@@ -79,6 +76,8 @@ exports.addToCart = async (req, res, next) => {
                     }
                 });
             }
+            cart.items[existingProductIndex].quantity += quantity;
+            cart.items[existingProductIndex].price += totalPrice;
         } else {
             cart.items.push({
                 productId,
@@ -107,7 +106,7 @@ exports.addToCart = async (req, res, next) => {
 
 exports.removeFromCart = async (req, res, next) => {
     try {
-        const userId = req.userId; // Assuming you get userId from token or session
+        const userId = req.userId;
         if (!userId) {
             throw new ErrorHandler(403, 'User not authenticated');
         }
@@ -158,41 +157,67 @@ exports.removeFromCart = async (req, res, next) => {
 
 exports.reduceQuantity = async (req, res, next) => {
     try {
-        const userId = req.userId; // Assuming you get userId from token or session
+        const userId = req.userId; 
         if (!userId) {
             throw new ErrorHandler(403, 'User not authenticated');
         }
 
         const { productId, selectedVariant, selectedOption } = req.body;
-        // Validate the required fields
         if (!productId) {
             throw new ErrorHandler(400, 'Product ID is required.');
         }
 
-        // Find the cart for the user
         const cart = await Cart.findOne({ userId });
-
         if (!cart) {
             throw new ErrorHandler(404, 'Cart not found for this user.');
         }
 
-        // Find the index of the product in the cart
+        const product = await Product.findById(productId);
+        if (!product) {
+            throw new ErrorHandler(404, 'Product not found.');
+        }
+
+        // Find the product in the cart
         const productIndex = cart.items.findIndex(
             (item) =>
                 item.productId.toString() === productId &&
-                item.selectedVariant === selectedVariant &&
-                item.selectedOption === selectedOption
+                (item.selectedVariant === selectedVariant || (!item.selectedVariant && !selectedVariant)) &&
+                (item.selectedOption === selectedOption || (!item.selectedOption && !selectedOption))
         );
 
         if (productIndex < 0) {
             throw new ErrorHandler(404, 'Product not found in cart.');
         }
 
-        // Reduce the quantity of the product by 1
+        // Calculate the price to reduce
+        let totalPrice = product.basePrice;
+
+        if (selectedVariant) {
+            const variant = product.variants.variantValues.find(vv => vv.value === selectedVariant);
+            if (variant) {
+                totalPrice = variant.price || product.basePrice;
+            }
+        }
+
+        if (selectedOption && selectedVariant) {
+            const variant = product.variants.variantValues.find(vv => vv.value === selectedVariant);
+            if (variant) {
+                const option = variant.options.optionValues.find(o => o.value === selectedOption);
+                if (option) {
+                    totalPrice = option.price || totalPrice;
+                }
+            }
+        }
+
         if (cart.items[productIndex].quantity > 1) {
             cart.items[productIndex].quantity -= 1;
+            cart.items[productIndex].price -= totalPrice;
+
+           
+            if (cart.items[productIndex].price < 0) {
+                cart.items[productIndex].price = 0;
+            }
         } else {
-            // If quantity is 1, remove the product from the cart
             cart.items.splice(productIndex, 1);
         }
 
@@ -209,11 +234,12 @@ exports.reduceQuantity = async (req, res, next) => {
         }
         next(err);
     }
-}
+};
+
 
 exports.clearCart = async (req, res, next) => {
     try {
-        const userId = req.userId; // Assuming you get userId from token or session
+        const userId = req.userId;
         if (!userId) {
             throw new ErrorHandler(403, 'User not authenticated');
         }
@@ -269,5 +295,5 @@ exports.getCart = async (req, res, next) => {
     }
 };
 
-
+//TODO: Remove Addon from Cart
 
