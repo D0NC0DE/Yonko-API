@@ -7,14 +7,14 @@ const addOnSchema = new Schema({
     name: { type: String, required: true },
     price: { type: Number, required: true, min: 0 },
     maxQuantityAllowed: { type: Number, default: 1 },
-}, { _id: false });
+});
 
 // Option value schema with price and quantity
 const optionValueSchema = new Schema({
     value: { type: String, required: true },
     price: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 0 },
-}, { _id: false });
+});
 
 const variantValueSchema = new Schema({
     value: { type: String, required: true },
@@ -29,7 +29,7 @@ const variantValueSchema = new Schema({
         },
         optionValues: [optionValueSchema],
     },
-}, { _id: false });
+});
 
 // Product schema containing variants and optional add-ons
 const productSchema = new Schema({
