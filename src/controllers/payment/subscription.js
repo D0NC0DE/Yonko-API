@@ -43,28 +43,24 @@ exports.initSubscription = async (req, res, next) => {
 
         const { email, package } = req.body;
         const shopId = req.shopId;
-
         if (!shopId) {
             throw new ErrorHandler(403, 'Forbidden');
         }
 
         const shop = await Shop.findById(shopId);
-
         if (!shop) {
             throw new ErrorHandler(404, 'Shop not found');
         }
 
-        // Check if the email matches
         if (shop.email !== email) {
             throw new ErrorHandler(403, 'Email does not match the shop owner\'s email');
         }
 
-        const amount = getPackageAmount(package);
-
+        const amount = getPackageAmount(package) * 100;
         const response = await initializePayment(email, amount);
         const payment = new Payment({
             email,
-            amount: amount * 100, // Ensure the correct conversion factor
+            amount: amount, // Ensure the correct conversion factor
             type: 'SUBSCRIPTION',
             reference: response.reference,
             shopId,

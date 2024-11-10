@@ -4,8 +4,6 @@ const express = require('express');
 // initialize packages
 const router = express.Router();
 
-const { emailValidationRules, passwordValidationRules, stringValidationRules } = require('../../../validations/validators');
-
 // Controllers
 const cartController = require('../../../controllers/product/cart');
 

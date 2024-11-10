@@ -5,6 +5,7 @@ const shopsRoutes = require('./api/v1/shops');
 const productRoutes = require('./api/v1/product');
 const productsRoutes = require('./api/v1/products');
 const cartRoutes = require('./api/v1/cart');
+const orderRoutes = require('./api/v1/orders');
 const subscriptionRoutes = require('./api/v1/subscription');
 const s3Routes = require('./api/v1/s3');
 
@@ -16,6 +17,7 @@ router.use('/shops', shopsRoutes);
 router.use('/product', productRoutes);
 router.use('/', productsRoutes);
 router.use('/cart', cartRoutes);
+router.use('/orders', orderRoutes);
 router.use('/', subscriptionRoutes);
 router.use('/s3', s3Routes);
 

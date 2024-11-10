@@ -9,7 +9,7 @@ exports.initializePayment = async (email, amount) => {
   try {
     const params = {
       email: email,
-      amount: amount * 100 // Paystack requires amount in kobo
+      amount: amount // Paystack requires amount in kobo
     };
 
     const response = await axios.post('https://api.paystack.co/transaction/initialize', params, {
