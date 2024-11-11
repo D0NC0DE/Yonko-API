@@ -74,7 +74,8 @@ exports.verifyPurchasePayment = async (req, res, next) => {
     session.startTransaction();
 
     try {
-        const { ref } = req.query;
+        const { reference } = req.body;
+        const ref = reference;
         const orderId = req.params.orderId;
 
         if (!ref || !orderId) {
@@ -158,7 +159,7 @@ exports.verifyPurchasePayment = async (req, res, next) => {
         }
 
         // Commit the transaction
-        
+        await session.commitTransaction();
 
         await Cart.updateOne(
             { userId: order.userId },
@@ -174,23 +175,21 @@ exports.verifyPurchasePayment = async (req, res, next) => {
                 price: item.price,
             })),
             totalAmount: order.totalAmount,
-            deliveryAddress: "Nigeria",
-            deliveryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+            deliveryAddress: "Nigeria",  // TODO: Add delivery address to order
+            deliveryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // TODO: Add delivery date to order
         };
 
         await sendOrderConfirmationEmail(email, orderDetails);
-
-        // Step 5: Create shop-specific orders after transaction commits
         await createShopOrders(order);
-
-        await session.commitTransaction();
+        
         res.status(200).json({
             message: 'Payment verified and order processed successfully',
             paymentStatus,
         });
     } catch (error) {
-        // Rollback transaction on error
-        await session.abortTransaction();
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
         next(error);
     } finally {
         session.endSession();

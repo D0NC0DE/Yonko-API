@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation</title>
+    <title>New Order Received</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
             background-color: #291918;
             padding: 20px;
             text-align: center;
-            color: #ffffff;
+            color: #fff;
         }
 
         .header img {
@@ -36,8 +36,7 @@
         }
 
         .header h1 {
-            margin: 10px 0;
-            font-size: 24px;
+            margin: 10px 0 5px;
         }
 
         .content {
@@ -85,13 +84,13 @@
             <a href="https://yonko.com/" target="_blank">
                 <img src="https://yonko-drive.ams3.cdn.digitaloceanspaces.com/yonko/logo.png" alt="Yonko Logo">
             </a>
-            <h1>Order Confirmation</h1>
-            <p>Thank you for your purchase, <strong><%= userName %></strong>!</p>
+            <h1>New Order Received</h1>
         </div>
 
         <!-- Content Section -->
         <div class="content">
-            <p>Your order has been confirmed. Below are the details of your purchase:</p>
+            <p>Dear <strong><%= shopName %></strong>,</p>
+            <p>You have received a new order. Below are the order details:</p>
 
             <!-- Order Information Table -->
             <table class="order-details">
@@ -113,48 +112,34 @@
                 </tbody>
             </table>
 
-            <p style="text-align: right; margin-top: 20px;">
-                <strong>Total Amount:</strong> ₦<%= totalAmount %>
+            <!-- Order Summary -->
+            <p style="margin-top: 20px; text-align: right;">
+                <strong>Total Order Amount:</strong> ₦<%= totalAmount %>
             </p>
 
-            <!-- Delivery Details Section -->
+            <!-- Delivery Details -->
             <div style="margin-top: 30px;">
-                <h3 style="font-size: 20px;">Delivery Information</h3>
+                <h3>Delivery Information</h3>
                 <p><strong>Delivery Address:</strong> <%= deliveryAddress %></p>
                 <p><strong>Estimated Delivery Date:</strong> <%= deliveryDate %></p>
             </div>
 
             <!-- Contact Information -->
-            <p style="margin-top: 20px; text-align: center;">
-                If you have any questions about your order, feel free to contact us at
+            <p style="margin-top: 20px;">If you have any questions, please contact us at 
                 <a href="mailto:support@yonko.com">support@yonko.com</a>.
             </p>
-
-            <div align="center" style="margin-top: 15px;">
-                <a href="https://www.yonkomktp.com/" target="_blank"
-                    style="display: inline-block; padding: 12px 30px; background-color: #291918; color: #ffffff; border-radius: 4px; text-decoration: none;">
-                    Visit Yonko Marketplace
-                </a>
-            </div>
         </div>
 
         <!-- Footer Section -->
         <div class="footer">
-            <p style="font-size: 14px; font-weight: bold; margin: 0 0 5px;">Yonko</p>
-            <p style="color: #d56743; font-size: 14px; margin: 0 0 15px;">
-                7, Diamond Close, Kurudu Barracks, FCT Abuja, Nigeria
+            <p>© 2024 Yonko Marketplace. All Rights Reserved.</p>
+            <p>
+                <a href="https://facebook.com/" target="_blank">Facebook</a> |
+                <a href="https://twitter.com/" target="_blank">Twitter</a> |
+                <a href="https://instagram.com/" target="_blank">Instagram</a> |
+                <a href="https://linkedin.com/" target="_blank">LinkedIn</a>
             </p>
-            <div style="margin: 15px 0;">
-                <a href="https://facebook.com/" target="_blank" style="margin: 0 8px;"><img
-                        src="https://yonko-drive.ams3.cdn.digitaloceanspaces.com/temp/fb.png" width="32"></a>
-                <a href="https://twitter.com/" target="_blank" style="margin: 0 8px;"><img
-                        src="https://yonko-drive.ams3.cdn.digitaloceanspaces.com/temp/x.png" width="32"></a>
-                <a href="https://instagram.com/" target="_blank" style="margin: 0 8px;"><img
-                        src="https://yonko-drive.ams3.cdn.digitaloceanspaces.com/temp/insta.png" width="32"></a>
-                <a href="https://linkedin.com/" target="_blank" style="margin: 0 8px;"><img
-                        src="https://yonko-drive.ams3.cdn.digitaloceanspaces.com/temp/linkedin.png" width="32"></a>
-            </div>
-            <p style="margin-top: 10px;">© 2024 Yonko. All Rights Reserved.</p>
+            <p>7, Diamond Close, Kurudu Barracks, FCT Abuja, Nigeria</p>
         </div>
     </div>
 </body>

@@ -5,6 +5,7 @@ const postmark = require("postmark");
 
 const config = require('../config/config');
 const rootDir = require('../utils/path');
+const shop = require('../models/shop');
 const client = new postmark.ServerClient(config.POSTMARK_API_KEY);
 
 // Paths for templates
@@ -12,6 +13,7 @@ const TEMPLATES = {
     accountSetup: path.join(rootDir, 'static', 'template.ejs'),
     welcome: path.join(rootDir, 'static', 'template.ejs'),
     order: path.join(rootDir, 'static', 'order.ejs'),
+    shopOrder: path.join(rootDir, 'static', 'shopOrder.ejs'),
 };
 
 // Email details like subjects and default text
@@ -28,6 +30,10 @@ const EMAIL_DETAILS = {
         subject: 'Order Confirmation - Yonko!',
         text: 'Your order has been confirmed. Please see the details below.',
     },
+    shopOrder: {
+        subject: 'New Order - Yonko!',
+        text: 'You have a new order. Please see the details below.',
+    }
 };
 
 // Generalized sendEmail function
@@ -75,6 +81,8 @@ const sendWelcomeEmail = async (recipientEmail) => {
 };
 
 const sendOrderConfirmationEmail = async (recipientEmail, orderDetails) => {
+    console.log('orderDetails', orderDetails);
+    console.log("username", orderDetails.userName);
     await sendEmail('order', recipientEmail, {
         userName: orderDetails.userName,
         orderItems: orderDetails.orderItems,
@@ -84,8 +92,19 @@ const sendOrderConfirmationEmail = async (recipientEmail, orderDetails) => {
     });
 };
 
+const sendNewOrderEmail = async (recipientEmail, orderDetails) => {
+    await sendEmail('order', recipientEmail, {
+        shopName: orderDetails.shopName,
+        orderItems: orderDetails.orderItems,
+        totalAmount: orderDetails.totalAmount,
+        deliveryAddress: orderDetails.deliveryAddress,
+        deliveryDate: orderDetails.deliveryDate,
+    });
+}
+
 module.exports = {
     sendAccountSetupEmail,
     sendWelcomeEmail,
     sendOrderConfirmationEmail,
+    sendNewOrderEmail
 };
