@@ -71,6 +71,7 @@ exports.initSubscription = async (req, res, next) => {
         res.status(200).json({
             message: 'Payment initialized successfully',
             accessCode: response.access_code,
+            authorizationUrl: response.authorization_url, 
             payment,
         });
     } catch (err) {

@@ -80,6 +80,17 @@ exports.directOrder = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
+        if (product.variants && product.variants.variantValues.length > 0) {
+            if (!selectedVariantId) {
+                throw new ErrorHandler(400, 'Product has variants. Please select a variant.');
+            }
+    
+            const variant = product.variants.variantValues.find(vv => vv._id.toString() === selectedVariantId.toString());
+            if (variant && variant.options && variant.options.optionValues.length > 0 && !selectedOptionId) {
+                throw new ErrorHandler(400, 'Selected variant has options. Please select an option.');
+            }
+        }
+
         // Calculate total price based on quantity and price
         const totalAmount = await calculateTotalPrice(product, quantity, selectedVariantId, selectedOptionId, selectedAddOns);
 
@@ -129,19 +140,23 @@ exports.checkout = async (req, res, next) => {
             return res.status(403).json({ message: 'Unauthorized access to this order.' });
         }
 
-        const goodsPrice = order.totalAmount * 100; // to kobo
+        const goodsPrice = order.totalAmount * 100; // Convert to kobo
         //TODO: Add delivery fee calculation
-        const deliveryFee = 500 * 100; // Fixed delivery fee in kobo  
+        const deliveryFee = 500 * 100; // Fixed delivery fee in kobo
         const amount = goodsPrice + deliveryFee;
+        
         const { serviceFee, finalAmount } = calculateFee(amount);
         const totalPurchaseCost = finalAmount;
+
+        await Order.findByIdAndUpdate(orderId, { totalPurchaseCost });
+
         res.status(200).json({
             message: 'Checkout summary',
             data: {
-            goodsPrice: goodsPrice / 100,
-            serviceFee: serviceFee / 100,
-            deliveryFee: deliveryFee / 100,
-            totalPurchaseCost: totalPurchaseCost / 100
+                goodsPrice: goodsPrice / 100,
+                serviceFee: serviceFee / 100,
+                deliveryFee: deliveryFee / 100,
+                totalPurchaseCost: totalPurchaseCost / 100
             }
         });
     } catch (err) {

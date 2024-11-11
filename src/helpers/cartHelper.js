@@ -40,7 +40,7 @@ async function calculateTotalPrice(product, quantity, selectedVariantId, selecte
             if (!productAddOn) {
                 throw new ErrorHandler(400, `Add-on with ID ${addOn.addOnId} does not belong to the product.`);
             }
-            totalPrice += productAddOn.price * addOn.quantity;
+            totalPrice += productAddOn.price * (addOn.quantity ?? 1);
         });
     }
 
@@ -51,6 +51,17 @@ async function addItemToCart(userId, productId, quantity, selectedVariantId, sel
     const product = await Product.findById(productId);
     if (!product) {
         throw new ErrorHandler(404, 'Product not found.');
+    }
+
+    if (product.variants && product.variants.variantValues.length > 0) {
+        if (!selectedVariantId) {
+            throw new ErrorHandler(400, 'Product has variants. Please select a variant.');
+        }
+
+        const variant = product.variants.variantValues.find(vv => vv._id.toString() === selectedVariantId.toString());
+        if (variant && variant.options && variant.options.optionValues.length > 0 && !selectedOptionId) {
+            throw new ErrorHandler(400, 'Selected variant has options. Please select an option.');
+        }
     }
 
     let cart = await Cart.findOne({ userId });
@@ -69,7 +80,7 @@ async function addItemToCart(userId, productId, quantity, selectedVariantId, sel
                 );
 
                 if (existingAddOnIndex >= 0) {
-                    cart.items[existingProductIndex].selectedAddOns[existingAddOnIndex].quantity += addOn.quantity;
+                    cart.items[existingProductIndex].selectedAddOns[existingAddOnIndex].quantity += addOn.quantity ?? 1;
                 } else {
                     cart.items[existingProductIndex].selectedAddOns.push(addOn);
                 }

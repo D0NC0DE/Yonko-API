@@ -13,10 +13,10 @@ const subscriptionController = require('../../../controllers/payment/subscriptio
 const shopAuth = require('../../../middleware/shopAuth');
 
 // Routes
-//POST /
-router.post('/subscription', shopAuth, emailValidationRules(), packageValidationRules(),  subscriptionController.initSubscription);
+//POST /subscriptions
+router.post('/initiate', shopAuth, emailValidationRules(), packageValidationRules(),  subscriptionController.initSubscription);
 
 // GET /
-router.get('/verifySubscription', subscriptionController.verifySubscription);
+router.get('/verify', subscriptionController.verifySubscription);
 
 module.exports = router;

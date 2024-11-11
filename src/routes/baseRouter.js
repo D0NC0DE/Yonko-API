@@ -18,7 +18,7 @@ router.use('/product', productRoutes);
 router.use('/', productsRoutes);
 router.use('/cart', cartRoutes);
 router.use('/orders', orderRoutes);
-router.use('/', subscriptionRoutes);
+router.use('/subscriptions', subscriptionRoutes);
 router.use('/s3', s3Routes);
 
 module.exports = router;

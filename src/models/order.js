@@ -29,7 +29,8 @@ const orderSchema = new Schema(
                 'REFUNDED'           // Payment refunded to the user
             ],
             default: 'PENDING'
-        }
+        },
+        totalPurchaseCost: { type: Number }, // Total cost of purchasing the items
     },
     { timestamps: true }
 );
