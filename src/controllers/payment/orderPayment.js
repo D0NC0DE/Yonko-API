@@ -106,6 +106,9 @@ exports.verifyPurchasePayment = async (req, res, next) => {
             .populate('items.productId', 'name')
             .session(session);
         if (!order) throw new ErrorHandler(404, 'Order not found');
+        if (order.status !== 'PENDING') {
+            throw new ErrorHandler(400, 'Order is not pending and cannot be processed');
+        }
 
         // Fetch the user details
         const user = await User.findById(order.userId).session(session);
