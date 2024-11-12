@@ -91,7 +91,7 @@ const sendOrderConfirmationEmail = async (recipientEmail, orderDetails) => {
 };
 
 const sendNewOrderEmail = async (recipientEmail, orderDetails) => {
-    await sendEmail('order', recipientEmail, {
+    await sendEmail('shopOrder', recipientEmail, {
         shopName: orderDetails.shopName,
         orderItems: orderDetails.orderItems,
         totalAmount: orderDetails.totalAmount,
