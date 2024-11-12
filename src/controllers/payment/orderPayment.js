@@ -171,7 +171,7 @@ exports.verifyPurchasePayment = async (req, res, next) => {
 
         const email = user.email;
         const orderDetails = {
-            username: user.name,
+            userName: user.name,
             orderItems: order.items.map(item => ({
                 name: item.productId.name,
                 quantity: item.quantity,

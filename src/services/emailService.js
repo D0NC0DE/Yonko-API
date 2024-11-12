@@ -81,8 +81,6 @@ const sendWelcomeEmail = async (recipientEmail) => {
 };
 
 const sendOrderConfirmationEmail = async (recipientEmail, orderDetails) => {
-    console.log('orderDetails', orderDetails);
-    console.log("username", orderDetails.userName);
     await sendEmail('order', recipientEmail, {
         userName: orderDetails.userName,
         orderItems: orderDetails.orderItems,
