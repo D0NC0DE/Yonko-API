@@ -76,7 +76,8 @@ const sendAccountSetupEmail = async (recipientEmail, otp) => {
 const sendWelcomeEmail = async (recipientEmail) => {
     await sendEmail('welcome', recipientEmail, {
         title: 'Welcome to Yonko!',
-        description: 'Thank you for joining us!'
+        description: 'Thank you for joining us!',
+        content: '',
     });
 };
 
