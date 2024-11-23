@@ -2,6 +2,7 @@ const { calculateTotalPrice } = require('../../helpers/cartHelper');
 const calculateFee = require('../../helpers/paymentHelper');
 const Cart = require('../../models/cart');
 const Order = require('../../models/order');
+const ShopOrder = require('../../models/shopOrder');
 const Product = require('../../models/product');
 const { ErrorHandler } = require('../../utils/errorHandler');
 
@@ -84,7 +85,7 @@ exports.directOrder = async (req, res, next) => {
             if (!selectedVariantId) {
                 throw new ErrorHandler(400, 'Product has variants. Please select a variant.');
             }
-    
+
             const variant = product.variants.variantValues.find(vv => vv._id.toString() === selectedVariantId.toString());
             if (variant && variant.options && variant.options.optionValues.length > 0 && !selectedOptionId) {
                 throw new ErrorHandler(400, 'Selected variant has options. Please select an option.');
@@ -144,7 +145,7 @@ exports.checkout = async (req, res, next) => {
         //TODO: Add delivery fee calculation
         const deliveryFee = 500 * 100; // Fixed delivery fee in kobo
         const amount = goodsPrice + deliveryFee;
-        
+
         const { serviceFee, finalAmount } = calculateFee(amount);
         const totalPurchaseCost = finalAmount;
 
@@ -158,6 +159,66 @@ exports.checkout = async (req, res, next) => {
                 deliveryFee: deliveryFee / 100,
                 totalPurchaseCost: totalPurchaseCost / 100
             }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getOrders = async (req, res, next) => {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            return res.status(403).json({ message: 'User not authenticated' });
+        }
+
+        const { status } = req.query;
+        const query = { userId };
+
+        if (status) {
+            query.status = status;
+        } else {
+            query.status = { $ne: 'PENDING' };
+        }
+
+        const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
+
+        if (orders.length === 0) {
+            return res.status(200).json({ message: 'No orders found', orders: [] });
+        }
+
+        res.status(200).json({
+            message: 'Orders retrieved successfully',
+            orders
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getShopOrders = async (req, res, next) => {
+    try {
+        const shopId = req.shopId;
+        if (!shopId) {
+            return res.status(403).json({ message: 'Shop not authenticated' });
+        }
+
+        const { status } = req.query;
+        const query = { shopId };
+
+        if (status) {
+            query.status = status;
+        } 
+        
+        const orders = await ShopOrder.find(query).sort({ createdAt: -1 }).lean();
+
+        if (orders.length === 0) {
+            return res.status(200).json({ message: 'No orders found', orders: [] });
+        }
+
+        res.status(200).json({
+            message: 'Orders retrieved successfully',
+            orders
         });
     } catch (err) {
         next(err);
